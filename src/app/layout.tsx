@@ -27,6 +27,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <div className="container mx-auto px-4">
+          <header className="py-4">
+            <h1 className="text-3xl font-bold">Welcome to My App</h1>
+          </header>
+        </div>
         {children}
       </body>
     </html>
