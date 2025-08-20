@@ -5,9 +5,18 @@ interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
+export const metadata = {
+  title: 'My App',
+  description: 'Admin Dashboard Example',
+};
+
+
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   return (
-    <div className="admin-layout">
+
+    <html lang="en">
+      <body>
+        <div className="admin-layout">
       <header className="admin-header">
         <nav>
             <h1 className='text-3xl '>Admin Dashboard</h1>
@@ -20,6 +29,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         <p>&copy; 2023 Admin Dashboard</p>
       </footer>
     </div>
+      </body>
+    </html>
+
+   
   );
 };
 
