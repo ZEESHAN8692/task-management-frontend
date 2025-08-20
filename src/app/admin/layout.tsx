@@ -1,39 +1,53 @@
-// src/app/admin/layout.tsx
-import React from 'react';
+"use client";
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import "../globals.css";
+import { useState } from "react";
+import Sidebar from "@/Layout/user/Sidebar";
+import Header from "@/Layout/user/Header";
+import Footer from "@/Layout/user/Footer";
+import AdminSidebar from "@/Layout/user/admin/AdminSidebar";
+import AdminHeader from "@/Layout/user/admin/AdminHeader";
+import AdminFooter from "@/Layout/user/admin/AdminFooter";
 
-interface AdminLayoutProps {
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export default function RootLayout({
+  children,
+}: Readonly<{
   children: React.ReactNode;
-}
+}>) {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-export const metadata = {
-  title: 'My App',
-  description: 'Admin Dashboard Example',
-};
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
 
-
-const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   return (
-
     <html lang="en">
-      <body>
-        <div className="admin-layout">
-      <header className="admin-header">
-        <nav>
-            <h1 className='text-3xl '>Admin Dashboard</h1>
-        </nav>
-      </header>
-      <main className="admin-main">
-        {children}
-      </main>
-      <footer className="admin-footer">
-        <p>&copy; 2023 Admin Dashboard</p>
-      </footer>
-    </div>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <div className="flex min-h-screen bg-[#0D1B2A] text-white">
+          <AdminSidebar isOpen={isSidebarOpen} onToggle={toggleSidebar} />
+
+          <div className="flex flex-col flex-1 min-w-0 ">
+            <AdminHeader onToggleSidebar={toggleSidebar} />
+
+            <main className="flex-1 overflow-y-auto bg-[#0D1B2A] p-0">
+              {children}
+            </main>
+
+            <AdminFooter />
+          </div>
+        </div>
       </body>
     </html>
-
-   
   );
-};
-
-export default AdminLayout;
+}

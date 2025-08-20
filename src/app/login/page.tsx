@@ -21,7 +21,7 @@ const Login = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="flex rounded-xl shadow-2xl overflow-hidden max-w-sm lg:max-w-4xl w-full border bg-blue-900 border-blue-800"
+        className="flex rounded-xl shadow-2xl overflow-hidden max-w-sm lg:max-w-4xl w-full  bg-blue-800 shadow-white border border-cyan-50"
       >
         <div
           className="hidden md:block lg:w-1/2 bg-cover bg-blue-700 relative"
