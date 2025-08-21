@@ -4,6 +4,7 @@ const base_url: string = "http://localhost:4000"
 
 const api_register_end: string = "/api/register";
 const api_login_end: string = "/api/login";
+const api_profile_end: string = "/api/profile";
 
 // Project routes
 const api_create_project_end: string = "/api/create-project";
@@ -37,6 +38,7 @@ export {
   base_url,
   api_register_end,
   api_login_end,
+  api_profile_end,
   api_create_project_end,
   api_get_projects_end,
   api_get_single_project_end,

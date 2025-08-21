@@ -2,14 +2,40 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useMutation } from '@tanstack/react-query';
+import { loginUser } from '@/queryFunction/queryFunction';
+import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
 
 const Login = () => {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const { mutate, isPending, isError, error } = useMutation({
+    mutationFn: loginUser,
+    onSuccess: (data) => {
+      toast.success('Login successful!');
+      console.log('Login successful:', data?.data);
+      console.log('Token:', data?.data.token);
+      sessionStorage.setItem('token', data?.data.token);
+      if(data?.data.data.role === 'admin') {
+        router.push('/admin');
+      }else{
+        router.push('/dashboard');
+      }
+    },
+    onError: (err) => {
+      toast.error(`Login failed: ${err.message}`);
+      console.error('Login error:', err.message);
+    }
+  });
+
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Login attempted with:', { email, password });
+    mutate({ email, password });
+    // console.log('Login attempted with:', { email, password });
   };
 
   return (

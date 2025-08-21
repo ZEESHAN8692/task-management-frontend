@@ -2,14 +2,32 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useMutation } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
+import { registerUser } from '@/queryFunction/queryFunction';
 
 const Register = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
     email: '',
     image: null,
     password: '',
+  });
+
+  const { mutate, isPending, isError, error } = useMutation({
+    mutationFn: registerUser,
+    onSuccess: (data) => {
+      toast.success('Register successful!');
+      console.log('Register successful:', data);
+      router.push('/login');
+    },
+    onError: (err) => {
+      toast.error(`Register failed: ${err.message}`);
+      console.error('Register error:', err.message);
+    }
   });
 
   const handleChange = (e) => {
@@ -23,6 +41,18 @@ const Register = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const formDataToSend = new FormData();
+    formDataToSend.append('name', formData.name);
+    formDataToSend.append('phone', formData.phone);
+    formDataToSend.append('email', formData.email);
+    formDataToSend.append('password', formData.password);
+    if (formData.image) {
+      formDataToSend.append('image', formData.image);
+    }
+
+    mutate(formDataToSend);
+
+
     console.log('Register form submitted:', formData);
     // Handle image upload or validation logic here
   };

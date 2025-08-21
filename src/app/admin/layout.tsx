@@ -9,6 +9,9 @@ import Footer from "@/Layout/user/Footer";
 import AdminSidebar from "@/Layout/user/admin/AdminSidebar";
 import AdminHeader from "@/Layout/user/admin/AdminHeader";
 import AdminFooter from "@/Layout/user/admin/AdminFooter";
+import { ToastContainer } from "react-toastify";
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+const queryClient = new QueryClient();
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,7 +44,22 @@ export default function RootLayout({
             <AdminHeader onToggleSidebar={toggleSidebar} />
 
             <main className="flex-1 overflow-y-auto bg-[#0D1B2A] p-0">
-              {children}
+              <QueryClientProvider client={queryClient}>
+                {children}
+              </QueryClientProvider>
+              <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick={false}
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="colored"
+              // transition={Bounce}
+              />
             </main>
 
             <AdminFooter />

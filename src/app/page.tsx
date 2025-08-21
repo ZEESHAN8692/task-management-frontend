@@ -1,16 +1,18 @@
 
+"use client";
 import Image from "next/image";
 
 import LandingFooter from '@/components/LandingLayout/Footer';
 import LandingHeader from '@/components/LandingLayout/Header';
 import Link from "next/link";
+import { toast } from "react-toastify";
 
 const page = () => {
+  
 
   return (
     <>
       <div className="min-h-screen bg-[#0D1B2A]">
-
         <LandingHeader />
         {/* Hero Section */}
         <section className="relative overflow-hidden">
