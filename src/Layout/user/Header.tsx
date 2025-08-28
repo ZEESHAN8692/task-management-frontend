@@ -1,6 +1,8 @@
 "use client";
 import { useRouter } from 'next/navigation';
 import React, { use } from 'react';
+import { getProfile } from '@/queryFunction/queryFunction';
+import { useQuery } from '@tanstack/react-query';
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -14,6 +16,13 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
     sessionStorage.clear();
     router.push('/login');
   }
+
+  const {data , isLoading} = useQuery({
+    queryKey: ['profile'],
+    queryFn: getProfile,
+  })
+  console.log("profile Data", data);
+
   return (
     <header className="bg-[#0D1B2A] border-b border-[#415A77]/20 px-4 py-3 lg:px-6">
       <div className="flex items-center justify-between">
@@ -115,6 +124,11 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
               className="hidden absolute top-full right-0 w-48 bg-[#1B263B] border border-[#415A77]/20 rounded-lg shadow-lg z-10"
               id="profile-dropdown-content"
             >
+                <div>
+                <div className='block w-full px-4 py-2 text-left text-[#F1F5F9] hover:bg-[#415A77]/10 focus:outline-none focus:bg-[#415A77]/10'>
+                  Zeeshan Khan 
+                </div>
+             </div>
               <button
                 type="button"
                 className="block w-full px-4 py-2 text-left text-[#F1F5F9] hover:bg-[#415A77]/10 focus:outline-none focus:bg-[#415A77]/10"
