@@ -1,7 +1,19 @@
+"use client";
+
+import { getAllProjects } from '@/queryFunction/queryFunction'
+import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import React from 'react'
 
 const Projects = () => {
+  const { data, error, isLoading } = useQuery({
+    queryKey: ['projects'],
+    queryFn:  getAllProjects
+  })
+
+  console.log("Project Data ",data)
+
+
   return (
     <div className="min-h-screen bg-[#0D1B2A] p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">

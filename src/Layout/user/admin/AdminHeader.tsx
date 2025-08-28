@@ -22,7 +22,7 @@ const AdminHeader: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
     queryFn: getProfile,
   })
   
-  console.log("profile Data", data);
+  // console.log("profile Data", data);
 
   return (
     <header className="bg-[#0D1B2A] border-b border-[#415A77]/20 px-4 py-3 lg:px-6">
@@ -116,7 +116,7 @@ const AdminHeader: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
             >
               <img
                 className="w-8 h-8 rounded-full"
-                src="https://images.unsplash.com/photo-1734122415415-88cb1d7d5dc0?q=80&w=320&h=320&auto=format&fit=facearea&facepad=3&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                src={data?.data?.data?.image}
                 alt="Profile"
               />
             </button>
@@ -127,7 +127,7 @@ const AdminHeader: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
             >
              <div>
                 <div className='block w-full px-4 py-2 text-left text-[#F1F5F9] hover:bg-[#415A77]/10 focus:outline-none focus:bg-[#415A77]/10'>
-                  Zeeshan Khan 
+                    {data?.data?.data?.name}
                 </div>
              </div>
               <button
