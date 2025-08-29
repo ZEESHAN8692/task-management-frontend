@@ -1,10 +1,14 @@
+import { getProjectMembers } from "@/queryFunction/queryFunction";
 import React, { useState, useEffect } from "react";
+import { useForm, Controller } from "react-hook-form";
+import Select from "react-select";
+import { toast } from "react-toastify";
 
 export interface Task {
   title: string;
   description: string;
   dueDate: string;
-  assignee: string;
+  assignee: string[];   // ✅ ab array
   project: string;
   status: "todo" | "in-progress" | "completed";
 }
@@ -13,46 +17,69 @@ interface TaskModelProps {
   onClose: () => void;
   onSave: (task: Task) => void;
   task?: Task | null;
+  productId: string
 }
 
-const TaskModel: React.FC<TaskModelProps> = ({ onClose, onSave, task }) => {
-  const [formData, setFormData] = useState<Task>({
-    title: "",
-    description: "",
-    dueDate: "",
-    assignee: "",
-    project: "",
-    status: "todo",
+const TaskModel: React.FC<TaskModelProps> = ({ onClose, onSave, task, productId }) => {
+  const [assignMembers, setAssignMembers] = useState<string[]>([]);
+  const { register, handleSubmit, control, reset } = useForm<Task>({
+    defaultValues: {
+      title: "",
+      description: "",
+      dueDate: "",
+      assignee: [],     // ✅ default empty array
+      project: "",
+      status: "todo",
+    },
   });
 
-  // If editing, pre-fill the form
   useEffect(() => {
     if (task) {
-      setFormData(task);
+      reset(task);
     }
-  }, [task]);
+  }, [task, reset]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const onSubmit = (data: Task) => {
+    console.log("Form Data:", data);
+    onSave(data);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSave(formData);
-  };
+  useEffect(() => {
+    const getAllProjectMembers = async()=>{
+      try {
+        const members = await getProjectMembers(productId);
+        // console.log("Asigned Members",members?.data);
+        setAssignMembers(members?.data);
+
+        
+      } catch (error) {
+        toast.error("Error getting project members");
+        
+      }
+    }
+    getAllProjectMembers();
+  },[])
+
+  // ✅ Example static members (yaha API call se bhi laa sakte ho)
+  // const membersOptions = [
+  //   { value: "alex", label: "Alex Johnson" },
+  //   { value: "sarah", label: "Sarah Chen" },
+  //   { value: "mike", label: "Mike Brown" },
+  // ];
+  const membersOptions = assignMembers.map((member:any)=>(
+    {
+      value: member._id,
+      label: member.name
+    }
+  ))
 
   return (
     <div id="task-modal" className="fixed inset-0 z-50">
-      {/* Background Overlay */}
       <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ease-in-out"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm"
         aria-hidden="true"
         onClick={onClose}
       />
-      {/* Modal Container */}
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <div className="bg-[#1B263B] border border-[#415A77]/50 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
           {/* Header */}
@@ -60,18 +87,14 @@ const TaskModel: React.FC<TaskModelProps> = ({ onClose, onSave, task }) => {
             <h2 className="text-xl font-semibold text-[#F1F5F9]">
               {task ? "Edit Task" : "Add Task"}
             </h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-[#3A86FF] transition-colors"
-              aria-label="Close modal"
-            >
+            <button onClick={onClose} className="text-gray-400 hover:text-[#3A86FF]">
               ✕
             </button>
           </div>
 
           {/* Form */}
           <div className="p-6 space-y-6">
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {/* Title */}
               <div>
                 <label className="block text-sm font-medium text-[#F1F5F9] mb-2">
@@ -79,10 +102,8 @@ const TaskModel: React.FC<TaskModelProps> = ({ onClose, onSave, task }) => {
                 </label>
                 <input
                   type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 bg-[#0D1B2A] border border-[#415A77]/50 rounded-lg text-[#F1F5F9] focus:border-[#3A86FF] focus:outline-none focus:ring-1 focus:ring-[#3A86FF]"
+                  {...register("title")}
+                  className="w-full px-4 py-3 bg-[#0D1B2A] border border-[#415A77]/50 rounded-lg text-[#F1F5F9]"
                   placeholder="Enter task title"
                   required
                 />
@@ -94,11 +115,9 @@ const TaskModel: React.FC<TaskModelProps> = ({ onClose, onSave, task }) => {
                   Description
                 </label>
                 <textarea
-                  name="description"
+                  {...register("description")}
                   rows={4}
-                  value={formData.description}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 bg-[#0D1B2A] border border-[#415A77]/50 rounded-lg text-[#F1F5F9] focus:border-[#3A86FF] focus:outline-none focus:ring-1 focus:ring-[#3A86FF]"
+                  className="w-full px-4 py-3 bg-[#0D1B2A] border border-[#415A77]/50 rounded-lg text-[#F1F5F9]"
                   placeholder="Enter task description"
                 />
               </div>
@@ -110,30 +129,69 @@ const TaskModel: React.FC<TaskModelProps> = ({ onClose, onSave, task }) => {
                     Due Date
                   </label>
                   <input
+                    style={{colorScheme:"dark"}}
                     type="date"
-                    name="dueDate"
-                    value={formData.dueDate}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 bg-[#0D1B2A] border border-[#415A77]/50 rounded-lg text-[#F1F5F9] focus:border-[#3A86FF]"
+                    {...register("dueDate")}
+                    className="w-full px-4 py-3 bg-[#0D1B2A] border border-[#415A77]/50 rounded-lg text-[#F1F5F9]"
+                    
                   />
                 </div>
 
-                {/* Assignee */}
+                {/* Assignee (Multi Select) */}
                 <div>
                   <label className="block text-sm font-medium text-[#F1F5F9] mb-2">
                     Assignee
                   </label>
-                  <select
+                  <Controller
                     name="assignee"
-                    value={formData.assignee}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 bg-[#0D1B2A] border border-[#415A77]/50 rounded-lg text-[#F1F5F9] focus:border-[#3A86FF]"
-                  >
-                    <option value="">Select assignee</option>
-                    <option>Alex Johnson</option>
-                    <option>Sarah Chen</option>
-                  </select>
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        isMulti
+                        options={membersOptions}
+                        value={membersOptions.filter(option =>
+                          field.value?.includes(option.value)
+                        )}
+                        onChange={(selected) =>
+                          field.onChange(selected.map((s) => s.value))
+                        }
+                        className="react-select-container"
+                        classNamePrefix="react-select"
+                        styles={{
+                          control: (base) => ({
+                            ...base,
+                            backgroundColor: "#0D1B2A",
+                            borderColor: "#415A77",
+                            color: "#F1F5F9",
+                          }),
+                          menu: (base) => ({
+                            ...base,
+                            backgroundColor: "#1B263B",
+                            color: "#F1F5F9",
+                          }),
+                          option: (base, state) => ({
+                            ...base,
+                            backgroundColor: state.isFocused
+                              ? "#3A86FF"
+                              : "#1B263B",
+                            color: "#F1F5F9",
+                          }),
+                          multiValue: (base) => ({
+                            ...base,
+                            backgroundColor: "#415A77",
+                            color: "#fff",
+                          }),
+                          multiValueLabel: (base) => ({
+                            ...base,
+                            color: "#fff",
+                          }),
+                        }}
+                      />
+                    )}
+                  />
                 </div>
+
 
                 {/* Project */}
                 <div>
@@ -141,10 +199,8 @@ const TaskModel: React.FC<TaskModelProps> = ({ onClose, onSave, task }) => {
                     Project
                   </label>
                   <select
-                    name="project"
-                    value={formData.project}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 bg-[#0D1B2A] border border-[#415A77]/50 rounded-lg text-[#F1F5F9] focus:border-[#3A86FF]"
+                    {...register("project")}
+                    className="w-full px-4 py-3 bg-[#0D1B2A] border border-[#415A77]/50 rounded-lg text-[#F1F5F9]"
                   >
                     <option value="">Select project</option>
                     <option>Website Redesign</option>
@@ -159,10 +215,8 @@ const TaskModel: React.FC<TaskModelProps> = ({ onClose, onSave, task }) => {
                     Status
                   </label>
                   <select
-                    name="status"
-                    value={formData.status}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 bg-[#0D1B2A] border border-[#415A77]/50 rounded-lg text-[#F1F5F9] focus:border-[#3A86FF]"
+                    {...register("status")}
+                    className="w-full px-4 py-3 bg-[#0D1B2A] border border-[#415A77]/50 rounded-lg text-[#F1F5F9]"
                   >
                     <option value="todo">To-Do</option>
                     <option value="in-progress">In Progress</option>
@@ -176,13 +230,13 @@ const TaskModel: React.FC<TaskModelProps> = ({ onClose, onSave, task }) => {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-6 py-2 border border-[#415A77]/50 text-[#F1F5F9] rounded-lg hover:bg-[#415A77]/20 transition-all duration-200"
+                  className="px-6 py-2 border border-[#415A77]/50 text-[#F1F5F9] rounded-lg"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-[#3A86FF] text-white rounded-lg hover:bg-[#3A86FF]/90 transition-all duration-200"
+                  className="px-6 py-2 bg-[#3A86FF] text-white rounded-lg hover:bg-[#3A86FF]/90"
                 >
                   Save Task
                 </button>

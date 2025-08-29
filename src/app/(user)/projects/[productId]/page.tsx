@@ -3,12 +3,14 @@
 import { useParams } from 'next/navigation';
 import React, { useState } from 'react'
 import TaskModel, { Task } from "@/components/user/TaskModel";
+import { useQuery } from '@tanstack/react-query';
+import { getTasksByProject } from '@/queryFunction/queryFunction';
 
 const SingleProject: React.FC = () => {
-    const { productId } = useParams();
+    // const { productId } = useParams();
     const params = useParams<{ productId: string }>();
     //   const productId = params?.productId;
-    console.log("Product ID:", productId);
+    console.log("Product ID:", params?.productId);
 
     const [showModal, setShowModal] = useState(false);
     const [editTask, setEditTask] = useState<Task | null>(null);
@@ -19,6 +21,13 @@ const SingleProject: React.FC = () => {
         setShowModal(false);
         setEditTask(null);
     };
+
+    const {data , isLoading , isError ,refetch}=useQuery({
+        queryKey: ['task'],
+        queryFn: getTasksByProject(params?.productId)
+    })
+
+    console.log("Task Data:", data);
 
     return (
         <>
@@ -146,6 +155,7 @@ const SingleProject: React.FC = () => {
                     }}
                     onSave={handleSaveTask}
                     task={editTask}
+                    productId={params?.productId}
                 />
             )}
 

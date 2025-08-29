@@ -5,21 +5,23 @@ const base_url: string = "http://localhost:4000"
 const api_register_end: string = "/api/register";
 const api_login_end: string = "/api/login";
 const api_profile_end: string = "/api/profile";
+const api_members_end: string = "/api/members";
 
 // Project routes
 const api_create_project_end: string = "/api/create-project";
 const api_get_projects_end: string = "/api/projects";
-const api_get_single_project_end: string = "/api/single-project/:id";
-const api_update_project_end: string = "/api/update-project/:id";
-const api_delete_project_end: string = "/api/delete-project/:id";
+const api_get_single_project_end: string = "/api/single-project";
+const api_get_project_members_end: string = "/api/projects";
+const api_update_project_end: string = "/api/update-project";
+const api_delete_project_end: string = "/api/delete-project";
 
 // Task routes
-const api_create_task_end: string = "/api/projects/:projectId/tasks";
-const api_get_tasks_by_project_end: string = "/api/projects/:projectId/tasks";
-const api_get_task_by_id_end: string = "/api/tasks/:id";
-const api_update_task_end: string = "/api/tasks/:id";
-const api_delete_task_end: string = "/api/tasks/:id";
-const api_move_task_end: string = "/api/tasks/:id/move";
+const api_create_task_end: string = "/api/projects";
+const api_get_tasks_by_project_end: string = "/api/projects";
+const api_get_task_by_id_end: string = "/api/tasks";
+const api_update_task_end: string = "/api/tasks";
+const api_delete_task_end: string = "/api/tasks";
+const api_move_task_end: string = "/api/tasks";
 
 // Admin routes
 const api_create_user_end: string = "/api/admin/create-user";
@@ -39,9 +41,11 @@ export {
   api_register_end,
   api_login_end,
   api_profile_end,
+  api_members_end,
   api_create_project_end,
   api_get_projects_end,
   api_get_single_project_end,
+  api_get_project_members_end,
   api_update_project_end,
   api_delete_project_end,
   api_create_task_end,

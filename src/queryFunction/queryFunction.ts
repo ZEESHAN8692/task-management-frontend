@@ -1,4 +1,4 @@
-import { api_create_project_end, api_delete_project_end, api_get_projects_end, api_get_single_project_end, api_login_end, api_profile_end, api_register_end, api_update_project_end } from "@/api/api_url";
+import { api_create_project_end, api_create_task_end, api_delete_project_end, api_get_project_members_end, api_get_projects_end, api_get_single_project_end, api_get_tasks_by_project_end, api_login_end, api_members_end, api_profile_end, api_register_end, api_update_project_end } from "@/api/api_url";
 import apiInstance from "@/api/axiosInstance";
 
 export const loginUser = async (data: { email: string; password: string }) => {
@@ -27,6 +27,15 @@ export const getProfile = async () => {
     throw error;
   }
 };
+
+export const getMembers = async () => {
+  try {
+    const response = await apiInstance.get(api_members_end);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
 
 
 // Project Routes 
@@ -59,6 +68,15 @@ export const getSingleProject = async (projectId: string) => {
   }
 };
 
+export const getProjectMembers = async (projectId: string) => {
+  try {
+    const response = await apiInstance.get(`${api_get_project_members_end}/${projectId}/members`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export const updateProject = async (projectId: string, projectData: any) => {
   try {
     const response = await apiInstance.put(`${api_update_project_end}/${projectId}`, projectData);
@@ -79,3 +97,70 @@ export const deleteProject = async (projectId: string) => {
 
 
 
+// Task Apis
+
+// Create Task
+export const createTask = async (projectId: string, taskData: any) => {
+  try {
+    const endpoint = `${api_create_task_end}/${projectId}/tasks`;
+    const response = await apiInstance.post(endpoint, taskData);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Get all tasks by project
+export const getTasksByProject = async (projectId: string) => {
+  try {
+    const endpoint = `${api_get_tasks_by_project_end}/${projectId}/tasks`;
+    const response = await apiInstance.get(endpoint);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Get single task by ID
+export const getTaskById = async (taskId: string) => {
+  try {
+    const endpoint = `${api_get_tasks_by_project_end}/${taskId}`;
+    const response = await apiInstance.get(endpoint);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Update Task
+export const updateTask = async (taskId: string, taskData: any) => {
+  try {
+    const endpoint = `${api_get_tasks_by_project_end}/${taskId}`;
+    const response = await apiInstance.put(endpoint, taskData);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Delete Task
+export const deleteTask = async (taskId: string) => {
+  try {
+    const endpoint = `${api_get_tasks_by_project_end}/${taskId}`; 
+    const response = await apiInstance.delete(endpoint);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Move Task (e.g., to another column/status)
+export const moveTask = async (taskId: string, moveData: any) => {
+  try {
+    const endpoint = `${api_get_tasks_by_project_end}/${taskId}/move`;
+    const response = await apiInstance.put(endpoint, moveData);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

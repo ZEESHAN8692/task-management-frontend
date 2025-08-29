@@ -6,6 +6,7 @@ import { useMutation } from '@tanstack/react-query';
 import { loginUser } from '@/queryFunction/queryFunction';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const Login = () => {
   const router = useRouter();
@@ -169,9 +170,9 @@ const Login = () => {
           >
             <p className="text-sm text-blue-200">
               Don't have an account?{' '}
-              <a href="/register" className="font-medium text-blue-400 hover:underline">
+              < Link href="/register" className="font-medium text-blue-400 hover:underline">
                 Sign up
-              </a>
+              </Link>
             </p>
           </motion.div>
         </div>
