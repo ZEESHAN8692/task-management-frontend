@@ -78,7 +78,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                   Dashboard
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <a
                   className="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-400 rounded-lg hover:bg-[#415A77]/20 focus:outline-none focus:bg-[#415A77]/20 hover:text-[#F1F5F9]"
                   href="/tasks"
@@ -97,7 +97,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                   </svg>
                   Tasks
                 </a>
-              </li>
+              </li> */}
               <li>
                 <Link
                   className="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-400 rounded-lg hover:bg-[#415A77]/20 focus:outline-none focus:bg-[#415A77]/20 hover:text-[#F1F5F9]"
@@ -120,7 +120,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                   Projects
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   className="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-400 rounded-lg hover:bg-[#415A77]/20 focus:outline-none focus:bg-[#415A77]/20 hover:text-[#F1F5F9]"
                   href="/kanban-board"
@@ -141,7 +141,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                   </svg>
                   Kanban Board
                 </Link>
-              </li>
+              </li> */}
 
             </ul>
           </nav>
