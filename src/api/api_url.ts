@@ -20,6 +20,7 @@ const api_create_task_end: string = "/api/projects";
 const api_get_tasks_by_project_end: string = "/api/projects";
 const api_get_tasks_progress: string = "/api/api_get_tasks_progress";
 const api_get_tasks_by_admin_end: string = "/api/admin/tasks"
+const api_get_task_create_by_end:string="/api/tasks/create-by"
 const api_get_task_by_id_end: string = "/api/tasks";
 const api_update_task_end: string = "/api/tasks";
 const api_delete_task_end: string = "/api/tasks";
@@ -53,6 +54,7 @@ export {
   api_create_task_end,
   api_get_tasks_by_project_end,
   api_get_tasks_by_admin_end,
+  api_get_task_create_by_end,
   api_get_tasks_progress,
   api_get_task_by_id_end,
   api_update_task_end,

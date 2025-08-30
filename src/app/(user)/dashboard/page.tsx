@@ -8,7 +8,7 @@ import {
   Legend
 } from 'chart.js'
 import { Doughnut } from 'react-chartjs-2'
-import { getAllProjects } from '@/queryFunction/queryFunction'
+import { getAllProjects, getTasksCountByCreator } from '@/queryFunction/queryFunction'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -27,9 +27,30 @@ const Dashboard = () => {
       console.error("Error fetching project count:", error);
     }
   };
-  
+
+  const getTaks = async () => {
+    try {
+      const res = await getTasksCountByCreator();
+      console.log("Tasks", res?.data);
+      setTaskCount(res?.data?.length || 0);
+
+      const completedTasks = res?.data?.filter((task: any) => task?.status === "Completed");
+      setCompletedCount(completedTasks?.length || 0);
+
+      const inProgressTasks = res?.data?.filter((task: any) => task?.status === "In Progress");
+      setInProgressCount(inProgressTasks?.length || 0);
+
+      const toDoTasks = res?.data?.filter((task: any) => task?.status === "To-Do");
+      setToDoCount(toDoTasks?.length || 0);
+
+    } catch (error) {
+      console.error("Error fetching task count:", error);
+    }
+  };
+
   useEffect(() => {
     getProductsCount();
+    getTaks();
   }, []);
 
 
@@ -38,7 +59,7 @@ const Dashboard = () => {
     datasets: [
       {
         label: 'Tasks Overview',
-        data: [projectCount, 247, 156, 42, 12],
+        data: [projectCount, taskCount, completedCount, inProgressCount, toDoCount],
         backgroundColor: [
           '#3A86FF',   // Total Projects - blue
           '#0D4DFF',   // Total Tasks - darker blue
@@ -93,7 +114,7 @@ const Dashboard = () => {
           <div className="bg-[#1B263B] rounded-lg p-6 border border-[#415A77]/20 flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-400 mb-1">Total Tasks</p>
-              <p className="text-3xl font-bold text-[#F1F5F9]">247</p>
+              <p className="text-3xl font-bold text-[#F1F5F9]">{taskCount}</p>
             </div>
             <div className="w-12 h-12 bg-[#0D4DFF]/20 rounded-lg flex items-center justify-center">
               <svg className="w-6 h-6 text-[#0D4DFF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -106,7 +127,7 @@ const Dashboard = () => {
           <div className="bg-[#1B263B] rounded-lg p-6 border border-[#415A77]/20 flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-400 mb-1">Completed</p>
-              <p className="text-3xl font-bold text-[#2EC4B6]">156</p>
+              <p className="text-3xl font-bold text-[#2EC4B6]">{completedCount}</p>
             </div>
             <div className="w-12 h-12 bg-[#2EC4B6]/20 rounded-lg flex items-center justify-center">
               <svg className="w-6 h-6 text-[#2EC4B6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -119,7 +140,7 @@ const Dashboard = () => {
           <div className="bg-[#1B263B] rounded-lg p-6 border border-[#415A77]/20 flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-400 mb-1">In Progress</p>
-              <p className="text-3xl font-bold text-[#FFBE0B]">42</p>
+              <p className="text-3xl font-bold text-[#FFBE0B]">{inProgressCount}</p>
             </div>
             <div className="w-12 h-12 bg-[#FFBE0B]/20 rounded-lg flex items-center justify-center">
               <svg className="w-6 h-6 text-[#FFBE0B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -132,7 +153,7 @@ const Dashboard = () => {
           <div className="bg-[#1B263B] rounded-lg p-6 border border-[#415A77]/20 flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-400 mb-1">To-Do</p>
-              <p className="text-3xl font-bold text-[#FF6B6B]">12</p>
+              <p className="text-3xl font-bold text-[#FF6B6B]">{toDoCount}</p>
             </div>
             <div className="w-12 h-12 bg-[#FF6B6B]/20 rounded-lg flex items-center justify-center">
               <svg className="w-6 h-6 text-[#FF6B6B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">

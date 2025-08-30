@@ -1,4 +1,4 @@
-import { api_create_project_end, api_create_task_end, api_create_user_end, api_delete_project_end, api_delete_task_end, api_delete_user_end, api_get_all_users_end, api_get_project_members_end, api_get_projects_end, api_get_single_project_end, api_get_single_user_end, api_get_tasks_by_admin_end, api_get_tasks_by_project_end, api_get_tasks_progress, api_login_end, api_members_end, api_move_task_end, api_profile_end, api_register_end, api_update_project_end, api_update_task_end, api_update_user_end } from "@/api/api_url";
+import { api_create_project_end, api_create_task_end, api_create_user_end, api_delete_project_end, api_delete_task_end, api_delete_user_end, api_get_all_users_end, api_get_project_members_end, api_get_projects_end, api_get_single_project_end, api_get_single_user_end, api_get_task_create_by_end, api_get_tasks_by_admin_end, api_get_tasks_by_project_end, api_get_tasks_progress, api_login_end, api_members_end, api_move_task_end, api_profile_end, api_register_end, api_update_project_end, api_update_task_end, api_update_user_end } from "@/api/api_url";
 import apiInstance from "@/api/axiosInstance";
 
 export const loginUser = async (data: { email: string; password: string }) => {
@@ -137,6 +137,16 @@ export const getTasksCountByAdmin = async () => {
   try {
     
     const response = await apiInstance.get(api_get_tasks_by_admin_end);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Get Task Count By Creator
+export const getTasksCountByCreator = async () => {
+  try {
+    const response = await apiInstance.get(api_get_task_create_by_end);
     return response.data;
   } catch (error) {
     throw error;
