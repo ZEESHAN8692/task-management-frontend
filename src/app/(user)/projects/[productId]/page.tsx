@@ -76,43 +76,38 @@ const SingleProject: React.FC = () => {
             queryClient.invalidateQueries({ queryKey: ["task", params?.productId] });
         }
     };
+    console.log("EditTasks:", editTask);
 
     //  Save / Update Task (modal)
-    const handleSaveTask = (taskData: Task) => {
+    const handleSaveTask = async (taskData: Task) => {
         try {
             if (editTask) {
-
                 try {
-                    updateTask(editTask._id, taskData);
+                    await updateTask(editTask._id, taskData);
                     toast.success("Task updated successfully!");
+                    setShowModal(false);
+                    refetch();
                 } catch (error) {
                     toast.error("Error updating task");
                     console.log(error);
-
                 }
             } else {
                 try {
-                    createTask(params?.productId, taskData);
+                    await createTask(params?.productId, taskData);
                     toast.success("Task created successfully!");
                     setShowModal(false);
                     refetch();
-                
                 } catch (error) {
                     toast.error("Error creating task");
                     console.log(error);
-
                 }
-
             }
-
         } catch (error) {
             toast.error("Error saving task");
             console.log(error);
         }
-        // console.log("Saved Task:", taskData);
-        // setShowModal(false);
-        // setEditTask(null);
     };
+
 
 
     // Kanban Columns
@@ -184,8 +179,8 @@ const SingleProject: React.FC = () => {
                                                 ref={dropProvided.innerRef}
                                                 {...dropProvided.droppableProps}
                                                 className={`bg-[#1B263B] rounded-lg p-4 border border-[#415A77]/20 transition-all ${dropSnapshot.isDraggingOver
-                                                        ? "border-[#3A86FF]/70"
-                                                        : ""
+                                                    ? "border-[#3A86FF]/70"
+                                                    : ""
                                                     }`}
                                             >
                                                 {/* Column Header */}
@@ -212,8 +207,8 @@ const SingleProject: React.FC = () => {
                                                                     {...dragProvided.draggableProps}
                                                                     {...dragProvided.dragHandleProps}
                                                                     className={`relative bg-[#0D1B2A] rounded-lg p-4 border border-[#415A77]/30 hover:border-[#3A86FF]/50 transition-all duration-200 cursor-pointer ${dragSnapshot.isDragging
-                                                                            ? "ring-1 ring-[#3A86FF]"
-                                                                            : ""
+                                                                        ? "ring-1 ring-[#3A86FF]"
+                                                                        : ""
                                                                         }`}
                                                                     // Note: drag aur click mix ho sakte hain — yeh ok rehta hai
                                                                     onClick={() => setEditTask(task)}
@@ -243,7 +238,7 @@ const SingleProject: React.FC = () => {
                                                                                     <button
                                                                                         onClick={(e) => {
                                                                                             e.stopPropagation();
-                                                                                            setEditTask(task);
+                                                                                            setEditTask(task._id, task);
                                                                                             setMenuOpen(null);
                                                                                         }}
                                                                                         className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-300 hover:bg-[#415A77]/30 cursor-pointer"

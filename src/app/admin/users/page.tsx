@@ -1,52 +1,61 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-
-const users = [
-  {
-    id: 1,
-    name: "John Doe",
-    phone: "123-456-7890",
-    email: "john.doe@example.com",
-    role: "admin",
-    image: "https://picsum.photos/200/300",
-  },
-  {
-    id: 2,
-    name: "Jane Doe",
-    phone: "098-765-4321",
-    email: "jane.doe@example.com",
-    role: "user",
-    image: "https://picsum.photos/200/301",
-  },
-  {
-    id: 3,
-    name: "Alex Johnson",
-    phone: "555-123-4567",
-    email: "alex.j@example.com",
-    role: "editor",
-    image: "https://picsum.photos/200/302",
-  },
-  {
-    id: 4,
-    name: "Sarah Williams",
-    phone: "444-987-6543",
-    email: "sarah.w@example.com",
-    role: "user",
-    image: "https://picsum.photos/200/303",
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { deleteUser, getAllUsers } from "@/queryFunction/queryFunction";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 const UserPage = () => {
-  const [userList, setUserList] = useState(users);
+  const [userList, setUserList] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
 
-  const handleDelete = (id) => {
-    setUserList(userList.filter((user) => user.id !== id));
+   const getUsers = async () => {
+    try {
+      const response = await getAllUsers();
+      console.log("Users", response?.data);
+      setUserList(response?.data);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  }
+
+  
+  useEffect(() => {
+    getUsers();
+ 
+  }, []);
+
+  const handleDelete = async(id:string) => {
+     Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await deleteUser(id);
+          await getUsers();
+          toast.success("Project deleted successfully");
+  
+          Swal.fire("Deleted!", "Your project has been deleted.", "success");
+        } catch (error) {
+          toast.error("Error deleting project");
+          Swal.fire("Error!", "Something went wrong while deleting.", "error");
+        }
+      }
+    })
+
+    
   };
 
+ 
   const handleEdit = (user) => {
-    setSelectedUser(user);
+    // setSelectedUser(user);
   };
 
   return (
@@ -133,7 +142,7 @@ const UserPage = () => {
                 <div className="ml-4">
                   <p className="text-sm text-gray-400">Regular Users</p>
                   <p className="text-2xl font-bold text-gray-200">
-                    {userList.filter((user) => user.role === "user").length}
+                    {userList.filter((user) => user?.role === "user").length}
                   </p>
                 </div>
               </div>
@@ -161,7 +170,7 @@ const UserPage = () => {
                 <div className="ml-4">
                   <p className="text-sm text-gray-400">Admin Users</p>
                   <p className="text-2xl font-bold text-gray-200">
-                    {userList.filter((user) => user.role === "admin").length}
+                    {userList.filter((user) => user?.role === "admin").length}
                   </p>
                 </div>
               </div>
@@ -197,7 +206,7 @@ const UserPage = () => {
               <tbody className="divide-y divide-[#415A77]">
                 {userList.map((user, index) => (
                   <motion.tr
-                    key={user.id}
+                    key={user?._id}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1, duration: 0.4 }}
@@ -211,41 +220,41 @@ const UserPage = () => {
                       <div className="flex items-center">
                         <motion.div whileHover={{ scale: 1.1 }} className="relative">
                           <img
-                            src={user.image}
-                            alt={user.name}
+                            src={user?.image}
+                            alt={user?.name}
                             className="w-12 h-12 rounded-full object-cover shadow-md border-2 border-[#778DA9]"
                           />
                           <div
                             className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#1B263B] ${
-                              user.role === "admin"
+                              user?.role === "admin"
                                 ? "bg-red-500"
-                                : user.role === "editor"
+                                : user?.role === "editor"
                                 ? "bg-blue-500"
                                 : "bg-green-500"
                             }`}
                           ></div>
                         </motion.div>
                         <div className="ml-4">
-                          <p className="font-semibold text-gray-100">{user.name}</p>
-                          <p className="text-sm text-gray-400">ID: {user.id}</p>
+                          <p className="font-semibold text-gray-100">{user?.name}</p>
+                          <p className="text-sm text-gray-400">ID: {user?._id}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="text-gray-100">{user.phone}</p>
-                      <p className="text-sm text-gray-400">{user.email}</p>
+                      <p className="text-gray-100">{user?.phone}</p>
+                      <p className="text-sm text-gray-400">{user?.email}</p>
                     </td>
                     <td className="px-6 py-4">
                       <span
                         className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                          user.role === "admin"
+                          user?.role === "admin"
                             ? "bg-red-900/30 text-red-300"
-                            : user.role === "editor"
+                            : user?.role === "editor"
                             ? "bg-blue-900/30 text-blue-300"
                             : "bg-green-900/30 text-green-300"
                         }`}
                       >
-                        {user.role}
+                        {user?.role}
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -267,7 +276,7 @@ const UserPage = () => {
                             backgroundColor: "#9c4a4a",
                           }}
                           whileTap={{ scale: 0.95 }}
-                          onClick={() => handleDelete(user.id)}
+                          onClick={() => handleDelete(user?._id)}
                           className="bg-[#774141] text-white px-4 py-2 rounded-lg shadow-md transition-all duration-200 flex items-center border border-[#9c6a6a]"
                         >
                           Delete

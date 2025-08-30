@@ -18,6 +18,8 @@ const api_delete_project_end: string = "/api/delete-project";
 // Task routes
 const api_create_task_end: string = "/api/projects";
 const api_get_tasks_by_project_end: string = "/api/projects";
+const api_get_tasks_progress: string = "/api/api_get_tasks_progress";
+const api_get_tasks_by_admin_end: string = "/api/admin/tasks"
 const api_get_task_by_id_end: string = "/api/tasks";
 const api_update_task_end: string = "/api/tasks";
 const api_delete_task_end: string = "/api/tasks";
@@ -25,10 +27,10 @@ const api_move_task_end: string = "/api/tasks";
 
 // Admin routes
 const api_create_user_end: string = "/api/admin/create-user";
-const api_update_user_end: string = "/api/admin/users/:id";
+const api_update_user_end: string = "/api/admin/users";
 const api_get_all_users_end: string = "/api/admin/users";
-const api_get_single_user_end: string = "/api/admin/users/:id";
-const api_delete_user_end: string = "/api/admin/users/:id";
+const api_get_single_user_end: string = "/api/admin/users";
+const api_delete_user_end: string = "/api/admin/users";
 
 // Column management routes
 const api_get_columns_end: string = "/api/admin/columns";
@@ -50,6 +52,8 @@ export {
   api_delete_project_end,
   api_create_task_end,
   api_get_tasks_by_project_end,
+  api_get_tasks_by_admin_end,
+  api_get_tasks_progress,
   api_get_task_by_id_end,
   api_update_task_end,
   api_delete_task_end,

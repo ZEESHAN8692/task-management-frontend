@@ -8,9 +8,9 @@ export interface Task {
   title: string;
   description: string;
   dueDate: string;
-  assignee: string[];  
+  assignedTo: string[];  
   project: string;
-  status: "todo" | "in-progress" | "completed";
+  status: "To-Do" | "In-Progress" | "Completed";
 }
 
 interface TaskModelProps {
@@ -27,15 +27,21 @@ const TaskModel: React.FC<TaskModelProps> = ({ onClose, onSave, task, productId,
       title: "",
       description: "",
       dueDate: "",
-      assignee: [],   
-      project: "",
+      assignedTo: [],   
+      projectId: "",
       status: "To-Do"
     },
   });
 
   useEffect(() => {
     if (task) {
-      reset(task);
+      reset({
+        ...task,
+       dueDate: task.dueDate ? task.dueDate.split("T")[0] : "",
+        assignedTo: task.assignedTo
+        ? task.assignedTo.map((m: any) => (typeof m === "object" ? m._id : m))
+        : [],
+      });
     }
   }, [task, reset]);
 
@@ -133,13 +139,44 @@ const TaskModel: React.FC<TaskModelProps> = ({ onClose, onSave, task, productId,
                   />
                 </div>
 
-                {/* Assignee (Multi Select) */}
+                {/* Project */}
+                {/* <div>
+                  <label className="block text-sm font-medium text-[#F1F5F9] mb-2">
+                    Project
+                  </label>
+                  <select
+                    {...register("projectId")}
+                    className="w-full px-4 py-3 bg-[#0D1B2A] border border-[#415A77]/50 rounded-lg text-[#F1F5F9]"
+                  >
+                    <option value="">Select project</option>
+                    <option>Website Redesign</option>
+                    <option>Mobile App</option>
+                    <option>API Development</option>
+                  </select>
+                </div> */}
+
+                {/* Status */}
                 <div>
                   <label className="block text-sm font-medium text-[#F1F5F9] mb-2">
-                    Assignee
+                    Status
+                  </label>
+                  <select
+                    {...register("status")}
+                    className="w-full px-4 py-3 bg-[#0D1B2A] border border-[#415A77]/50 rounded-lg text-[#F1F5F9]"
+                  >
+                    <option value="To-Do">To-Do</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                  </select>
+                </div>
+              </div>
+                 {/* Assignee (Multi Select) */}
+                <div>
+                  <label className="block text-sm font-medium text-[#F1F5F9] mb-2">
+                    Assigned To
                   </label>
                   <Controller
-                    name="assignee"
+                    name="assignedTo"
                     control={control}
                     render={({ field }) => (
                       <Select
@@ -187,39 +224,6 @@ const TaskModel: React.FC<TaskModelProps> = ({ onClose, onSave, task, productId,
                     )}
                   />
                 </div>
-
-
-                {/* Project */}
-                <div>
-                  <label className="block text-sm font-medium text-[#F1F5F9] mb-2">
-                    Project
-                  </label>
-                  <select
-                    {...register("project")}
-                    className="w-full px-4 py-3 bg-[#0D1B2A] border border-[#415A77]/50 rounded-lg text-[#F1F5F9]"
-                  >
-                    <option value="">Select project</option>
-                    <option>Website Redesign</option>
-                    <option>Mobile App</option>
-                    <option>API Development</option>
-                  </select>
-                </div>
-
-                {/* Status */}
-                <div>
-                  <label className="block text-sm font-medium text-[#F1F5F9] mb-2">
-                    Status
-                  </label>
-                  <select
-                    {...register("status")}
-                    className="w-full px-4 py-3 bg-[#0D1B2A] border border-[#415A77]/50 rounded-lg text-[#F1F5F9]"
-                  >
-                    <option value="To-Do">To-Do</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Completed">Completed</option>
-                  </select>
-                </div>
-              </div>
 
               {/* Buttons */}
               <div className="flex justify-end space-x-4 pt-4">

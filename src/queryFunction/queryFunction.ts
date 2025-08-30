@@ -1,4 +1,4 @@
-import { api_create_project_end, api_create_task_end, api_delete_project_end, api_delete_task_end, api_get_project_members_end, api_get_projects_end, api_get_single_project_end, api_get_tasks_by_project_end, api_login_end, api_members_end, api_move_task_end, api_profile_end, api_register_end, api_update_project_end } from "@/api/api_url";
+import { api_create_project_end, api_create_task_end, api_create_user_end, api_delete_project_end, api_delete_task_end, api_delete_user_end, api_get_all_users_end, api_get_project_members_end, api_get_projects_end, api_get_single_project_end, api_get_single_user_end, api_get_tasks_by_admin_end, api_get_tasks_by_project_end, api_get_tasks_progress, api_login_end, api_members_end, api_move_task_end, api_profile_end, api_register_end, api_update_project_end, api_update_task_end, api_update_user_end } from "@/api/api_url";
 import apiInstance from "@/api/axiosInstance";
 
 export const loginUser = async (data: { email: string; password: string }) => {
@@ -110,6 +110,17 @@ export const createTask = async (projectId: string, taskData: any) => {
   }
 };
 
+// router.get("/tasks/progress/:projectId",AuthCheck, taskController.getTaskProgress);
+
+export const getTaskProgress = async (projectId: string) => {
+  try {
+    const endpoint = `${api_get_tasks_progress}/${projectId}`;
+    const response = await apiInstance.get(endpoint);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
 // Get all tasks by project
 export const getTasksByProject = async (projectId: string) => {
   try {
@@ -120,6 +131,18 @@ export const getTasksByProject = async (projectId: string) => {
     throw error;
   }
 };
+
+// Get Task Count By Admin 
+export const getTasksCountByAdmin = async () => {
+  try {
+    
+    const response = await apiInstance.get(api_get_tasks_by_admin_end);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 
 // Get single task by ID
 export const getTaskById = async (taskId: string) => {
@@ -135,7 +158,7 @@ export const getTaskById = async (taskId: string) => {
 // Update Task
 export const updateTask = async (taskId: string, taskData: any) => {
   try {
-    const endpoint = `${api_get_tasks_by_project_end}/${taskId}`;
+    const endpoint = `${api_update_task_end}/${taskId}`;
     const response = await apiInstance.put(endpoint, taskData);
     return response.data;
   } catch (error) {
@@ -164,3 +187,61 @@ export const moveTask = async (taskId: string, moveData: any) => {
     throw error;
   }
 };
+
+
+// Admin Api Call 
+
+// Create User
+export const createUser = async (userData: any) => {
+  try {
+    const response = await apiInstance.post(api_create_user_end, userData);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Update User
+export const updateUser = async (userId: string, updateData: any) => {
+  try {
+    const endpoint = `${api_update_user_end}/${userId}`;
+    const response = await apiInstance.put(endpoint, updateData);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Get All Users
+export const getAllUsers = async () => {
+  try {
+    const response = await apiInstance.get(api_get_all_users_end);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Get Single User
+export const getSingleUser = async (userId: string) => {
+  try {
+    const endpoint = `${api_get_single_user_end}/${userId}`;
+    const response = await apiInstance.get(endpoint);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Delete User
+export const deleteUser = async (userId: string) => {
+  try {
+    const endpoint = `${api_delete_user_end}/${userId}`;
+    const response = await apiInstance.delete(endpoint);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
