@@ -1,4 +1,4 @@
-import { api_create_project_end, api_create_task_end, api_delete_project_end, api_get_project_members_end, api_get_projects_end, api_get_single_project_end, api_get_tasks_by_project_end, api_login_end, api_members_end, api_profile_end, api_register_end, api_update_project_end } from "@/api/api_url";
+import { api_create_project_end, api_create_task_end, api_delete_project_end, api_delete_task_end, api_get_project_members_end, api_get_projects_end, api_get_single_project_end, api_get_tasks_by_project_end, api_login_end, api_members_end, api_move_task_end, api_profile_end, api_register_end, api_update_project_end } from "@/api/api_url";
 import apiInstance from "@/api/axiosInstance";
 
 export const loginUser = async (data: { email: string; password: string }) => {
@@ -146,7 +146,7 @@ export const updateTask = async (taskId: string, taskData: any) => {
 // Delete Task
 export const deleteTask = async (taskId: string) => {
   try {
-    const endpoint = `${api_get_tasks_by_project_end}/${taskId}`; 
+    const endpoint = `${api_delete_task_end}/${taskId}`; 
     const response = await apiInstance.delete(endpoint);
     return response.data;
   } catch (error) {
@@ -157,8 +157,8 @@ export const deleteTask = async (taskId: string) => {
 // Move Task (e.g., to another column/status)
 export const moveTask = async (taskId: string, moveData: any) => {
   try {
-    const endpoint = `${api_get_tasks_by_project_end}/${taskId}/move`;
-    const response = await apiInstance.put(endpoint, moveData);
+    const endpoint = `${api_move_task_end}/${taskId}/move`;
+    const response = await apiInstance.patch(endpoint, moveData);
     return response.data;
   } catch (error) {
     throw error;

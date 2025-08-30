@@ -8,7 +8,7 @@ export interface Task {
   title: string;
   description: string;
   dueDate: string;
-  assignee: string[];   // ✅ ab array
+  assignee: string[];  
   project: string;
   status: "todo" | "in-progress" | "completed";
 }
@@ -20,16 +20,16 @@ interface TaskModelProps {
   productId: string
 }
 
-const TaskModel: React.FC<TaskModelProps> = ({ onClose, onSave, task, productId }) => {
+const TaskModel: React.FC<TaskModelProps> = ({ onClose, onSave, task, productId,  }) => {
   const [assignMembers, setAssignMembers] = useState<string[]>([]);
   const { register, handleSubmit, control, reset } = useForm<Task>({
     defaultValues: {
       title: "",
       description: "",
       dueDate: "",
-      assignee: [],     // ✅ default empty array
+      assignee: [],   
       project: "",
-      status: "todo",
+      status: "To-Do"
     },
   });
 
@@ -42,7 +42,9 @@ const TaskModel: React.FC<TaskModelProps> = ({ onClose, onSave, task, productId 
   const onSubmit = (data: Task) => {
     console.log("Form Data:", data);
     onSave(data);
+
   };
+
 
   useEffect(() => {
     const getAllProjectMembers = async()=>{
@@ -60,12 +62,6 @@ const TaskModel: React.FC<TaskModelProps> = ({ onClose, onSave, task, productId 
     getAllProjectMembers();
   },[])
 
-  // ✅ Example static members (yaha API call se bhi laa sakte ho)
-  // const membersOptions = [
-  //   { value: "alex", label: "Alex Johnson" },
-  //   { value: "sarah", label: "Sarah Chen" },
-  //   { value: "mike", label: "Mike Brown" },
-  // ];
   const membersOptions = assignMembers.map((member:any)=>(
     {
       value: member._id,
@@ -218,9 +214,9 @@ const TaskModel: React.FC<TaskModelProps> = ({ onClose, onSave, task, productId 
                     {...register("status")}
                     className="w-full px-4 py-3 bg-[#0D1B2A] border border-[#415A77]/50 rounded-lg text-[#F1F5F9]"
                   >
-                    <option value="todo">To-Do</option>
-                    <option value="in-progress">In Progress</option>
-                    <option value="completed">Completed</option>
+                    <option value="To-Do">To-Do</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
                   </select>
                 </div>
               </div>

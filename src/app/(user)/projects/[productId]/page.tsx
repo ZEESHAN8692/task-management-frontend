@@ -1,150 +1,359 @@
 "use client";
 
-import { useParams } from 'next/navigation';
-import React, { useState } from 'react'
+import { useParams } from "next/navigation";
+import React, { useState } from "react";
 import TaskModel, { Task } from "@/components/user/TaskModel";
-import { useQuery } from '@tanstack/react-query';
-import { getTasksByProject } from '@/queryFunction/queryFunction';
+import {
+    useQuery,
+    useQueryClient,
+} from "@tanstack/react-query";
+import {
+    getTasksByProject,
+    deleteTask,
+    moveTask,
+    updateTask,
+    createTask,
+} from "@/queryFunction/queryFunction";
+import { Trash2, MoreVertical, Pencil } from "lucide-react";
+import { toast } from "react-toastify";
+
+
+import {
+    DragDropContext,
+    Droppable,
+    Draggable,
+    type DropResult,
+} from "@hello-pangea/dnd";
+import { set } from "react-hook-form";
 
 const SingleProject: React.FC = () => {
-    // const { productId } = useParams();
     const params = useParams<{ productId: string }>();
-    //   const productId = params?.productId;
-    console.log("Product ID:", params?.productId);
+    const queryClient = useQueryClient();
 
     const [showModal, setShowModal] = useState(false);
     const [editTask, setEditTask] = useState<Task | null>(null);
+    const [menuOpen, setMenuOpen] = useState<string | null>(null);
 
-    // Save / Update Task
-    const handleSaveTask = (taskData: Task) => {
-        console.log("Saved Task:", taskData);
-        setShowModal(false);
-        setEditTask(null);
+    //  Fetch tasks
+    const { data, isLoading, isError, refetch } = useQuery({
+        queryKey: ["task", params?.productId],
+        queryFn: () => getTasksByProject(params?.productId),
+    });
+
+    // NOTE: API returns { data: Task[] } -> adjust if your shape differs
+    const tasks = data?.data || [];
+
+    // Delete task
+    const handleDelete = async (taskId: string) => {
+        try {
+            await deleteTask(taskId);
+            await refetch();
+            toast.success("Task deleted successfully!");
+        } catch (error) {
+            toast.error("Error deleting task");
+            console.log(error);
+        }
     };
 
-    const {data , isLoading , isError ,refetch}=useQuery({
-        queryKey: ['task'],
-        queryFn: getTasksByProject(params?.productId)
-    })
+    // Move task via API (from dropdown buttons)
+    const handleMoveTask = async (taskId: string, nextStatus: string) => {
+        try {
+            // optimistic update
+            queryClient.setQueryData(["task", params?.productId], (old: any) => {
+                if (!old?.data) return old;
+                const updated = old.data.map((t: any) =>
+                    t._id === taskId ? { ...t, status: nextStatus } : t
+                );
+                return { ...old, data: updated };
+            });
 
-    console.log("Task Data:", data);
+            await moveTask(taskId, { status: nextStatus });
+            await refetch();
+            toast.success("Task moved successfully!");
+        } catch (error) {
+            toast.error("Error moving task");
+            console.log(error);
+            queryClient.invalidateQueries({ queryKey: ["task", params?.productId] });
+        }
+    };
+
+    //  Save / Update Task (modal)
+    const handleSaveTask = (taskData: Task) => {
+        try {
+            if (editTask) {
+
+                try {
+                    updateTask(editTask._id, taskData);
+                    toast.success("Task updated successfully!");
+                } catch (error) {
+                    toast.error("Error updating task");
+                    console.log(error);
+
+                }
+            } else {
+                try {
+                    createTask(params?.productId, taskData);
+                    toast.success("Task created successfully!");
+                    setShowModal(false);
+                    refetch();
+                
+                } catch (error) {
+                    toast.error("Error creating task");
+                    console.log(error);
+
+                }
+
+            }
+
+        } catch (error) {
+            toast.error("Error saving task");
+            console.log(error);
+        }
+        // console.log("Saved Task:", taskData);
+        // setShowModal(false);
+        // setEditTask(null);
+    };
+
+
+    // Kanban Columns
+    const columns = [
+        { title: "To-Do", status: "To-Do", color: "text-[#FFBE0B]" },
+        { title: "In Progress", status: "In Progress", color: "text-[#3A86FF]" },
+        { title: "Completed", status: "Completed", color: "text-[#2EC4B6]" },
+    ];
+
+    // 🔁 Drag end handler
+    const onDragEnd = async (result: DropResult) => {
+        const { destination, source, draggableId } = result;
+        if (!destination) return;
+
+        const from = source.droppableId;
+        const to = destination.droppableId;
+
+        // same place
+        if (from === to && source.index === destination.index) return;
+
+        // optimistic UI: update status of dragged task
+        queryClient.setQueryData(["task", params?.productId], (old: any) => {
+            if (!old?.data) return old;
+            const updated = old.data.map((t: any) =>
+                t._id === draggableId ? { ...t, status: to } : t
+            );
+            return { ...old, data: updated };
+        });
+
+        try {
+            await moveTask(draggableId, { status: to });
+            // sync with server
+            await refetch();
+            toast.success("Task moved");
+        } catch (err) {
+            toast.error("Move failed");
+            console.error(err);
+            queryClient.invalidateQueries({ queryKey: ["task", params?.productId] });
+        }
+    };
 
     return (
         <>
             <section id="kanban" className="min-h-screen bg-[#0D1B2A] p-8">
                 <div className="max-w-7xl mx-auto">
-                    <h1 className="text-3xl font-bold text-[#F1F5F9] mb-8">Kanban Board</h1>
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {/* To-Do Column */}
-                        <div className="bg-[#1B263B] rounded-lg p-4 border border-[#415A77]/20">
-                            <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-lg font-semibold text-[#F1F5F9]">To-Do</h2>
-                                <span className="bg-[#415A77]/20 text-[#F1F5F9] text-sm px-2 py-1 rounded">8</span>
-                            </div>
-                            <div className="space-y-3">
-                                <div className="bg-[#0D1B2A] rounded-lg p-4 border border-[#415A77]/30 hover:border-[#3A86FF]/50 transition-all duration-200 cursor-pointer">
-                                    <h3 className="text-[#F1F5F9] font-medium mb-2">Design landing page</h3>
-                                    <p className="text-sm text-gray-400 mb-3">Create mockups for new landing page</p>
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-xs text-[#FFBE0B]">Due in 3 days</span>
-                                        <img src="https://images.unsplash.com/photo-1555209183-8facf96a4349?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MzQ2fDB8MXxzZWFyY2h8MXx8ZGFyayUyMHdvcmtzcGFjZSUyMHNldHVwfGVufDF8MHx8fDE3NTU0NTcxMTV8MA&ixlib=rb-4.1.0&q=80&w=1080" className="w-6 h-6 rounded-full object-cover" />
-                                    </div>
-                                </div>
-                                <div className="bg-[#0D1B2A] rounded-lg p-4 border border-[#415A77]/30 hover:border-[#3A86FF]/50 transition-all duration-200 cursor-pointer">
-                                    <h3 className="text-[#F1F5F9] font-medium mb-2">Setup database</h3>
-                                    <p className="text-sm text-gray-400 mb-3">Configure PostgreSQL database schema</p>
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-xs text-[#FF6B6B]">Due today</span>
-                                        <img src="https://images.unsplash.com/photo-1548008407-3af86cb54c8a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MzQ2fDB8MXxzZWFyY2h8Mnx8ZGFyayUyMHdvcmtzcGFjZSUyMHNldHVwfGVufDF8MHx8fDE3NTU0NTcxMTV8MA&ixlib=rb-4.1.0&q=80&w=1080" className="w-6 h-6 rounded-full object-cover" />
-                                    </div>
-                                </div>
-                                <div className="bg-[#0D1B2A] rounded-lg p-4 border border-[#415A77]/30 hover:border-[#3A86FF]/50 transition-all duration-200 cursor-pointer">
-                                    <h3 className="text-[#F1F5F9] font-medium mb-2">API integration</h3>
-                                    <p className="text-sm text-gray-400 mb-3">Connect payment gateway API</p>
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-xs text-[#2EC4B6]">Due in 5 days</span>
-                                        <img src="https://images.unsplash.com/photo-1589010539781-b59882ded3c8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MzQ2fDB8MXxzZWFyY2h8M3x8ZGFyayUyMHdvcmtzcGFjZSUyMHNldHVwfGVufDF8MHx8fDE3NTU0NTcxMTV8MA&ixlib=rb-4.1.0&q=80&w=1080" className="w-6 h-6 rounded-full object-cover" />
-                                    </div>
-                                </div>
-                            </div>
-                            <button className="w-full mt-4 py-2 border border-[#3A86FF]/50 text-[#3A86FF] rounded-lg hover:bg-[#3A86FF]/10 transition-all duration-200">
-                                + Add Task
-                            </button>
+                    <h1 className="text-3xl font-bold text-[#F1F5F9] mb-8">
+                        Kanban Board
+                    </h1>
+
+                    {isError && (
+                        <p className="text-red-500">Failed to load tasks. Try again.</p>
+                    )}
+                    {isLoading && (
+                        <p className="text-gray-400">Loading tasks...</p>
+                    )}
+
+                    {/* 🧲 DnD Context */}
+                    <DragDropContext onDragEnd={onDragEnd}>
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            {columns.map((col) => {
+                                const filteredTasks = tasks.filter(
+                                    (task: any) => task.status === col.status
+                                );
+
+                                return (
+                                    <Droppable droppableId={col.status} key={col.status}>
+                                        {(dropProvided, dropSnapshot) => (
+                                            <div
+                                                ref={dropProvided.innerRef}
+                                                {...dropProvided.droppableProps}
+                                                className={`bg-[#1B263B] rounded-lg p-4 border border-[#415A77]/20 transition-all ${dropSnapshot.isDraggingOver
+                                                        ? "border-[#3A86FF]/70"
+                                                        : ""
+                                                    }`}
+                                            >
+                                                {/* Column Header */}
+                                                <div className="flex items-center justify-between mb-4">
+                                                    <h2 className="text-lg font-semibold text-[#F1F5F9]">
+                                                        {col.title}
+                                                    </h2>
+                                                    <span className="bg-[#415A77]/20 text-[#F1F5F9] text-sm px-2 py-1 rounded">
+                                                        {filteredTasks.length}
+                                                    </span>
+                                                </div>
+
+                                                {/* Tasks */}
+                                                <div className="space-y-3">
+                                                    {filteredTasks.map((task: any, index: number) => (
+                                                        <Draggable
+                                                            key={task._id}
+                                                            draggableId={task._id}
+                                                            index={index}
+                                                        >
+                                                            {(dragProvided, dragSnapshot) => (
+                                                                <div
+                                                                    ref={dragProvided.innerRef}
+                                                                    {...dragProvided.draggableProps}
+                                                                    {...dragProvided.dragHandleProps}
+                                                                    className={`relative bg-[#0D1B2A] rounded-lg p-4 border border-[#415A77]/30 hover:border-[#3A86FF]/50 transition-all duration-200 cursor-pointer ${dragSnapshot.isDragging
+                                                                            ? "ring-1 ring-[#3A86FF]"
+                                                                            : ""
+                                                                        }`}
+                                                                    // Note: drag aur click mix ho sakte hain — yeh ok rehta hai
+                                                                    onClick={() => setEditTask(task)}
+                                                                >
+                                                                    {/* Actions - Top Right */}
+                                                                    <div className="absolute top-2 right-2 flex items-center gap-2">
+                                                                        {/* Three Dot Menu */}
+                                                                        <div className="relative">
+                                                                            <button
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    setEditTask(null);
+                                                                                    setMenuOpen(
+                                                                                        menuOpen === task._id
+                                                                                            ? null
+                                                                                            : task._id
+                                                                                    );
+                                                                                }}
+                                                                                className="text-gray-400 hover:text-white"
+                                                                            >
+                                                                                <MoreVertical size={18} />
+                                                                            </button>
+
+                                                                            {/* Dropdown */}
+                                                                            {menuOpen === task._id && (
+                                                                                <div className="absolute right-0 mt-2 w-48 bg-[#1B263B] border border-[#415A77]/40 rounded-lg shadow-lg z-10">
+                                                                                    <button
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            setEditTask(task);
+                                                                                            setMenuOpen(null);
+                                                                                        }}
+                                                                                        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-300 hover:bg-[#415A77]/30 cursor-pointer"
+                                                                                    >
+                                                                                        <Pencil size={16} /> Edit
+                                                                                    </button>
+                                                                                    <button
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            handleDelete(task._id);
+                                                                                            setMenuOpen(null);
+                                                                                        }}
+                                                                                        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-400 hover:bg-red-600/30 cursor-pointer"
+                                                                                    >
+                                                                                        <Trash2 size={16} /> Delete
+                                                                                    </button>
+                                                                                    <hr className="border-t border-[#415A77]/40 my-2" />
+                                                                                    <button
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            handleMoveTask(
+                                                                                                task._id,
+                                                                                                "To-Do"
+                                                                                            );
+                                                                                            setMenuOpen(null);
+                                                                                        }}
+                                                                                        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-300 hover:bg-[#415A77]/30 cursor-pointer"
+                                                                                    >
+                                                                                        Move to To-Do
+                                                                                    </button>
+                                                                                    <button
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            handleMoveTask(
+                                                                                                task._id,
+                                                                                                "In Progress"
+                                                                                            );
+                                                                                            setMenuOpen(null);
+                                                                                        }}
+                                                                                        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-300 hover:bg-[#415A77]/30 cursor-pointer"
+                                                                                    >
+                                                                                        Move to In-Progress
+                                                                                    </button>
+                                                                                    <button
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            handleMoveTask(
+                                                                                                task._id,
+                                                                                                "Completed"
+                                                                                            );
+                                                                                            setMenuOpen(null);
+                                                                                        }}
+                                                                                        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-300 hover:bg-[#415A77]/30 cursor-pointer"
+                                                                                    >
+                                                                                        Move to Completed
+                                                                                    </button>
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {/* Task Content */}
+                                                                    <h3 className="text-[#F1F5F9] font-medium mb-2">
+                                                                        {task.title}
+                                                                    </h3>
+                                                                    <p className="text-sm text-gray-400 mb-3">
+                                                                        {task.description}
+                                                                    </p>
+                                                                    <div className="flex items-center justify-between">
+                                                                        <span className={`text-xs ${col.color}`}>
+                                                                            {task.status === "Completed"
+                                                                                ? "Completed"
+                                                                                : `Due: ${new Date(
+                                                                                    task.dueDate
+                                                                                ).toLocaleDateString()}`}
+                                                                        </span>
+                                                                        <div className="flex -space-x-2">
+                                                                            {task.assignedTo?.map((user: any) => (
+                                                                                <img
+                                                                                    key={user._id}
+                                                                                    src={user.image}
+                                                                                    alt={user.name}
+                                                                                    className="w-6 h-6 rounded-full object-cover border-2 border-[#1B263B]"
+                                                                                />
+                                                                            ))}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </Draggable>
+                                                    ))}
+                                                    {dropProvided.placeholder}
+                                                </div>
+
+                                                {/* Add Task Button */}
+                                                <button
+                                                    className="w-full mt-4 py-2 border border-[#3A86FF]/50 text-[#3A86FF] rounded-lg hover:bg-[#3A86FF]/10 transition-all duration-200"
+                                                    onClick={() => setShowModal(true)}
+                                                >
+                                                    + Add Task
+                                                </button>
+                                            </div>
+                                        )}
+                                    </Droppable>
+                                );
+                            })}
                         </div>
-                        {/* In Progress Column */}
-                        <div className="bg-[#1B263B] rounded-lg p-4 border border-[#415A77]/20">
-                            <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-lg font-semibold text-[#F1F5F9]">In Progress</h2>
-                                <span className="bg-[#415A77]/20 text-[#F1F5F9] text-sm px-2 py-1 rounded">5</span>
-                            </div>
-                            <div className="space-y-3">
-                                <div className="bg-[#0D1B2A] rounded-lg p-4 border border-[#FFBE0B]/30 hover:border-[#FFBE0B]/50 transition-all duration-200 cursor-pointer">
-                                    <h3 className="text-[#F1F5F9] font-medium mb-2">User authentication</h3>
-                                    <p className="text-sm text-gray-400 mb-3">Implement OAuth2 authentication flow</p>
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-xs text-[#FFBE0B]">2 days left</span>
-                                        <div className="flex -space-x-2">
-                                            <img src="https://images.unsplash.com/photo-1555209183-8facf96a4349?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MzQ2fDB8MXxzZWFyY2h8MXx8ZGFyayUyMHdvcmtzcGFjZSUyMHNldHVwfGVufDF8MHx8fDE3NTU0NTcxMTV8MA&ixlib=rb-4.1.0&q=80&w=1080" className="w-6 h-6 rounded-full object-cover border-2 border-[#1B263B]" />
-                                            <img src="https://images.unsplash.com/photo-1548008407-3af86cb54c8a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MzQ2fDB8MXxzZWFyY2h8Mnx8ZGFyayUyMHdvcmtzcGFjZSUyMHNldHVwfGVufDF8MHx8fDE3NTU0NTcxMTV8MA&ixlib=rb-4.1.0&q=80&w=1080" className="w-6 h-6 rounded-full object-cover border-2 border-[#1B263B]" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="bg-[#0D1B2A] rounded-lg p-4 border border-[#3A86FF]/30 hover:border-[#3A86FF]/50 transition-all duration-200 cursor-pointer">
-                                    <h3 className="text-[#F1F5F9] font-medium mb-2">Dashboard analytics</h3>
-                                    <p className="text-sm text-gray-400 mb-3">Build analytics dashboard with charts</p>
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-xs text-[#2EC4B6]">On track</span>
-                                        <img src="https://images.unsplash.com/photo-1589010539781-b59882ded3c8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MzQ2fDB8MXxzZWFyY2h8M3x8ZGFyayUyMHdvcmtzcGFjZSUyMHNldHVwfGVufDF8MHx8fDE3NTU0NTcxMTV8MA&ixlib=rb-4.1.0&q=80&w=1080" className="w-6 h-6 rounded-full object-cover" />
-                                    </div>
-                                </div>
-                            </div>
-                            <button className="w-full mt-4 py-2 border border-[#3A86FF]/50 text-[#3A86FF] rounded-lg hover:bg-[#3A86FF]/10 transition-all duration-200">
-                                + Add Task
-                            </button>
-                        </div>
-                        {/* Completed Column */}
-                        <div className="bg-[#1B263B] rounded-lg p-4 border border-[#415A77]/20">
-                            <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-lg font-semibold text-[#F1F5F9]">Completed</h2>
-                                <span className="bg-[#415A77]/20 text-[#F1F5F9] text-sm px-2 py-1 rounded">12</span>
-                            </div>
-                            <div className="space-y-3">
-                                <div className="bg-[#0D1B2A] rounded-lg p-4 border border-[#2EC4B6]/30 hover:border-[#2EC4B6]/50 transition-all duration-200 cursor-pointer">
-                                    <h3 className="text-[#F1F5F9] font-medium mb-2">✓ Email templates</h3>
-                                    <p className="text-sm text-gray-400 mb-3">Design responsive email templates</p>
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-xs text-[#2EC4B6]">Completed</span>
-                                        <img src="https://images.unsplash.com/photo-1555209183-8facf96a4349?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MzQ2fDB8MXxzZWFyY2h8MXx8ZGFyayUyMHdvcmtzcGFjZSUyMHNldHVwfGVufDF8MHx8fDE3NTU0NTcxMTV8MA&ixlib=rb-4.1.0&q=80&w=1080" className="w-6 h-6 rounded-full object-cover" />
-                                    </div>
-                                </div>
-                                <div className="bg-[#0D1B2A] rounded-lg p-4 border border-[#2EC4B6]/30 hover:border-[#2EC4B6]/50 transition-all duration-200 cursor-pointer"
-                                    onClick={() =>
-                                        setEditTask({
-                                            title: "Design landing page",
-                                            description: "Create mockups for new landing page",
-                                            dueDate: "2025-09-05",
-                                            assignee: "Alex Johnson",
-                                            project: "Website Redesign",
-                                            status: "Completed",
-                                        })
-                                    }
-                                >
-                                    <h3 className="text-[#F1F5F9] font-medium mb-2">✓ Bug fixes</h3>
-                                    <p className="text-sm text-gray-400 mb-3">Fix reported bugs from QA</p>
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-xs text-[#2EC4B6]">Completed</span>
-                                        <img src="https://images.unsplash.com/photo-1548008407-3af86cb54c8a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MzQ2fDB8MXxzZWFyY2h8Mnx8ZGFyayUyMHdvcmtzcGFjZSUyMHNldHVwfGVufDF8MHx8fDE3NTU0NTcxMTV8MA&ixlib=rb-4.1.0&q=80&w=1080" className="w-6 h-6 rounded-full object-cover" />
-                                    </div>
-                                </div>
-                            </div>
-                            <button className="w-full mt-4 py-2 border border-[#3A86FF]/50 text-[#3A86FF] rounded-lg hover:bg-[#3A86FF]/10 transition-all duration-200" onClick={() => setShowModal(true)}>
-                                + Add Task
-                            </button>
-                        </div>
-                    </div>
+                    </DragDropContext>
                 </div>
             </section>
-
 
             {/* Task Modal */}
             {(showModal || editTask) && (
@@ -158,12 +367,9 @@ const SingleProject: React.FC = () => {
                     productId={params?.productId}
                 />
             )}
-
-
-
         </>
-    )
-}
+    );
+};
 
-export default SingleProject
+export default SingleProject;
 
