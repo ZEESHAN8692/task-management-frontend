@@ -22,6 +22,7 @@ const Login = () => {
       sessionStorage.setItem('token', data?.data.token);
       if(data?.data.data.role === 'admin') {
         router.push('/admin');
+        sessionStorage.setItem('role', data?.data.data.role);
       }else{
         router.push('/dashboard');
       }

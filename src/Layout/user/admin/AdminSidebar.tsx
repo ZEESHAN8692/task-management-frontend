@@ -1,5 +1,6 @@
 "use client";
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import React from 'react';
 
 interface SidebarProps {
@@ -8,6 +9,16 @@ interface SidebarProps {
 }
 
 const AdminSidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
+    const pathname = usePathname();
+  
+    const linkClass = (path: string) =>
+      `flex items-center gap-x-3.5 py-2 px-2.5 text-sm rounded-lg focus:outline-none transition
+       ${
+         pathname === path
+           ? "bg-[#1B263B] text-[#F1F5F9]" // 👈 active page styling
+           : "text-gray-400 hover:bg-[#415A77]/20 hover:text-[#F1F5F9]"
+       }`;
+  
   return (
     <>
       {/* Mobile Overlay */}
@@ -35,7 +46,7 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
               TaskHub Admin
             </a>
             <button
-              type="button"
+            type="button"
               className="lg:hidden flex justify-center items-center w-6 h-6 bg-[#1B263B] border border-[#415A77]/20 text-gray-400 hover:bg-[#415A77]/10 rounded-full focus:outline-none focus:bg-[#415A77]/10"
               onClick={onToggle}
             >
@@ -60,7 +71,7 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
             <ul className="space-y-1">
               <li>
                 <Link
-                  className="flex items-center gap-x-3.5 py-2 px-2.5 bg-[#1B263B] text-sm text-[#F1F5F9] rounded-lg hover:bg-[#415A77]/20 focus:outline-none focus:bg-[#415A77]/20"
+                  className={`flex items-center gap-x-3.5 py-2 px-2.5 ${linkClass("/admin")} text-sm text-[#F1F5F9] rounded-lg hover:bg-[#415A77]/20 focus:outline-none focus:bg-[#415A77]/20`}
                   href="/admin"
                 >
                   <svg
@@ -82,7 +93,7 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
         
               <li>
                 <Link
-                  className="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-400 rounded-lg hover:bg-[#415A77]/20 focus:outline-none focus:bg-[#415A77]/20 hover:text-[#F1F5F9]"
+                  className={`flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-400 rounded-lg hover:bg-[#415A77]/20 focus:outline-none focus:bg-[#415A77]/20 hover:text-[#F1F5F9] ${linkClass("/admin/projects")}`}
                   href="/admin/projects"
                 >
                   <svg
@@ -105,7 +116,7 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
     
               <li>
                 <Link
-                  className="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-400 rounded-lg hover:bg-[#415A77]/20 focus:outline-none focus:bg-[#415A77]/20 hover:text-[#F1F5F9]"
+                  className={`flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-400 rounded-lg hover:bg-[#415A77]/20 focus:outline-none focus:bg-[#415A77]/20 hover:text-[#F1F5F9] ${linkClass("/admin/users")}`}
                   href="/admin/users"
                 >
                   <svg

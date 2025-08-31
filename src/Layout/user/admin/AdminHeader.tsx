@@ -134,7 +134,7 @@ const AdminHeader: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                 type="button"
                 className="block w-full px-4 py-2 text-left text-[#F1F5F9] hover:bg-[#415A77]/10 focus:outline-none focus:bg-[#415A77]/10"
                 onClick={() => {
-                  router.push('/profile');
+                  router.push('/admin/profile');
                 }}
               >
                 Profile

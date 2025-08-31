@@ -85,7 +85,7 @@ const SingleProject: React.FC = () => {
                 try {
                     await updateTask(editTask._id, taskData);
                     toast.success("Task updated successfully!");
-                    setShowModal(false);
+                    ()=>setShowModal(false);
                     refetch();
                 } catch (error) {
                     toast.error("Error updating task");

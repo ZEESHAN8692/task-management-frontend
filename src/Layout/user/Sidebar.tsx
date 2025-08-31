@@ -1,6 +1,7 @@
 "use client";
 import Link from 'next/link';
 import React from 'react';
+import { usePathname } from "next/navigation"
 
 interface SidebarProps {
   isOpen: boolean;
@@ -8,6 +9,17 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
+  const pathname = usePathname();
+
+  const linkClass = (path: string) =>
+    `flex items-center gap-x-3.5 py-2 px-2.5 text-sm rounded-lg focus:outline-none transition
+     ${
+       pathname === path
+         ? "bg-[#1B263B] text-[#F1F5F9]" // 👈 active page styling
+         : "text-gray-400 hover:bg-[#415A77]/20 hover:text-[#F1F5F9]"
+     }`;
+
+  
   return (
     <>
       {/* Mobile Overlay */}
@@ -59,8 +71,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
             <ul className="space-y-1">
               <li>
                 <Link
-                  className="flex items-center gap-x-3.5 py-2 px-2.5 bg-[#1B263B] text-sm text-[#F1F5F9] rounded-lg hover:bg-[#415A77]/20 focus:outline-none focus:bg-[#415A77]/20"
+                  className={`flex items-center gap-x-3.5 py-2 px-2.5 ${linkClass('/dashboard')} text-sm text-[#F1F5F9] rounded-lg hover:bg-[#415A77]/20 focus:outline-none focus:bg-[#415A77]/20`}
                   href="/dashboard"
+                  
                 >
                   <svg
                     className="w-4 h-4 text-[#3A86FF]"
@@ -78,29 +91,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                   Dashboard
                 </Link>
               </li>
-              {/* <li>
-                <a
-                  className="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-400 rounded-lg hover:bg-[#415A77]/20 focus:outline-none focus:bg-[#415A77]/20 hover:text-[#F1F5F9]"
-                  href="/tasks"
-                >
-                  <svg
-                    className="w-4 h-4"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2H9z" />
-                  </svg>
-                  Tasks
-                </a>
-              </li> */}
+  
               <li>
                 <Link
-                  className="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-400 rounded-lg hover:bg-[#415A77]/20 focus:outline-none focus:bg-[#415A77]/20 hover:text-[#F1F5F9]"
+                  className={`flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-400 rounded-lg hover:bg-[#415A77]/20 focus:outline-none focus:bg-[#415A77]/20 hover:text-[#F1F5F9] ${linkClass('/projects')}`}
                   href="/projects"
                 >
                   <svg
