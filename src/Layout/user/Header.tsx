@@ -110,6 +110,11 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                 const dropdown = document.getElementById("profile-dropdown-content");
                 if (dropdown) {
                   dropdown.classList.toggle("hidden");
+                  document.addEventListener("click", (event) => {
+                    if (!event.target.closest("#profile-dropdown") && !event.target.closest("#profile-dropdown-content")) {
+                      dropdown.classList.add("hidden");
+                    }
+                  });
                 }
               }}
             >

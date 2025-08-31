@@ -136,6 +136,28 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                   Users
                 </Link>
               </li>
+
+              <li>
+                <Link
+                  className={`flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-400 rounded-lg hover:bg-[#415A77]/20 focus:outline-none focus:bg-[#415A77]/20 hover:text-[#F1F5F9] ${linkClass("/admin/add_users")}`}
+                  href="/admin/add_users"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Add Users
+                </Link>
+              </li>
+             
             </ul>
           </nav>
 

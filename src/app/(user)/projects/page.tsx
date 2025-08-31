@@ -21,8 +21,10 @@ const Projects = () => {
     queryFn: getAllProjects
   });
 
+  console.log("Projects", data?.data?.data);
+
   const handleFormSubmit = async (formData: any) => {
-    console.log("Submitted Data: ", formData);
+    // console.log("Submitted Data: ", formData);
 
     if (selectedProject) {
       try {
@@ -53,7 +55,7 @@ const Projects = () => {
     try {
       const res = await getTasksCountByProject();
       setTaskCount(res?.data);
-      console.log("Tasks Details ", res?.data);
+      // console.log("Tasks Details ", res?.data);
     } catch (error) {
       console.error("Error fetching task count:", error);
     }
@@ -62,6 +64,7 @@ const Projects = () => {
   useEffect(() => {
     getTaks();
   }, []);
+  
 
   const handleDelete = async (id: any) => {
     Swal.fire({
@@ -133,7 +136,7 @@ const Projects = () => {
     tap: { scale: 0.95 }
   };
 
-  console.log("Task Count Data", taskCount);
+  // console.log("Task Count Data", taskCount);
 
   return (
     <>
@@ -208,6 +211,7 @@ const Projects = () => {
                             transition={{ duration: 0.2 }}
                           >
                             {project?.name}
+                            <span className="text-blue-200 text-sm ml-2 text-[10px">({project?.createdBy?.name})</span>
                           </motion.h3>
                         </Link>
                         <p className="text-gray-400 text-sm">{project?.description.slice(0, 60)}</p>

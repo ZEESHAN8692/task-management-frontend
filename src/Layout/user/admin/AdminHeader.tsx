@@ -100,7 +100,7 @@ const AdminHeader: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
           </button>
 
           {/* User Profile (Mobile) */}
-          <div className="relative">
+             <div className="relative">
             <button
               type="button"
               className="flex items-center justify-center w-8 h-8 rounded-full focus:outline-none focus:ring-2 focus:ring-[#3A86FF]"
@@ -111,6 +111,11 @@ const AdminHeader: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                 const dropdown = document.getElementById("profile-dropdown-content");
                 if (dropdown) {
                   dropdown.classList.toggle("hidden");
+                  document.addEventListener("click", (event) => {
+                    if (!event.target.closest("#profile-dropdown") && !event.target.closest("#profile-dropdown-content")) {
+                      dropdown.classList.add("hidden");
+                    }
+                  });
                 }
               }}
             >
@@ -125,16 +130,16 @@ const AdminHeader: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
               className="hidden absolute top-full right-0 w-48 bg-[#1B263B] border border-[#415A77]/20 rounded-lg shadow-lg z-10"
               id="profile-dropdown-content"
             >
-             <div>
+                <div>
                 <div className='block w-full px-4 py-2 text-left text-[#F1F5F9] hover:bg-[#415A77]/10 focus:outline-none focus:bg-[#415A77]/10'>
-                    {data?.data?.data?.name}
+                  {data?.data?.data?.name}
                 </div>
              </div>
               <button
                 type="button"
                 className="block w-full px-4 py-2 text-left text-[#F1F5F9] hover:bg-[#415A77]/10 focus:outline-none focus:bg-[#415A77]/10"
                 onClick={() => {
-                  router.push('/admin/profile');
+                  router.push('/profile');
                 }}
               >
                 Profile

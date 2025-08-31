@@ -76,7 +76,7 @@ const SingleProject: React.FC = () => {
             queryClient.invalidateQueries({ queryKey: ["task", params?.productId] });
         }
     };
-    console.log("EditTasks:", editTask);
+    // console.log("EditTasks:", editTask);
 
     //  Save / Update Task (modal)
     const handleSaveTask = async (taskData: Task) => {

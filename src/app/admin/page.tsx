@@ -47,7 +47,7 @@ const Admin = () => {
   const getUsers = async () => {
     try {
       const response = await getAllUsers();
-      console.log("Users", response?.data?.length);
+      // console.log("Users", response?.data?.length);
       setUserCount(response?.data?.length || 0);
     } catch (error) {
       console.error("Error fetching users:", error);

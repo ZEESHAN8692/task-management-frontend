@@ -1,15 +1,24 @@
 "use client";
 import Link from 'next/link'
+import { usePathname } from 'next/navigation';
 
 
-import React, { useState } from 'react'
+import React, { use, useEffect, useState } from 'react'
 
 const LandingHeader = () => {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
+
+
+  useEffect(() => {
+    const t = typeof window !== "undefined" ? sessionStorage.getItem("token") : null;
+    setToken(t);
+  }, []);
+  console.log("Token", token);
 
   return (
     <>
-           {/* Navigation */}
+      {/* Navigation */}
       <nav className="bg-[#0D1B2A] border-b border-[#415A77]/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -103,18 +112,43 @@ const LandingHeader = () => {
               >
                 Pricing
               </a>
-              <Link
-                href="/login"
-                className="bg-[#3A86FF] text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-[#3A86FF]/90"
-              >
-                Login
-              </Link>
-              <Link
-                href="/register"
-                className="bg-[#415A77]/20 text-[#F1F5F9] block px-3 py-2 rounded-md text-base font-medium hover:bg-[#415A77]/30"
-              >
-                Sign Up
-              </Link>
+              {token === null ? (
+                <Link
+                  href="/dashboard"
+                  className="bg-[#415A77]/20 text-[#F1F5F9] block px-3 py-2 rounded-md text-base font-medium hover:bg-[#415A77]/30"
+                >
+                  User Dashboard
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="bg-[#3A86FF] text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-[#3A86FF]/90"
+                  >
+                    Login
+                  </Link>
+
+
+
+                  <Link
+                    href="/register"
+                    className="bg-[#415A77]/20 text-[#F1F5F9] block px-3 py-2 rounded-md text-base font-medium hover:bg-[#415A77]/30"
+                  >
+                    Sign Up
+                  </Link>
+                </>
+
+              )}
+
+
+
+
+
+
+
+
+
+
             </div>
           </div>
         )}
