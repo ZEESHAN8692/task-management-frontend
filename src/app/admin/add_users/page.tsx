@@ -74,7 +74,7 @@ const AddUser = () => {
           Add User
         </motion.p>
 
-        <p className="text-center mt-2 text-cyan-400">
+        <p className="text-center mt-2 text-gray-400">
           Fill details to add a new user
         </p>
 
