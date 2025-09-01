@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import React from 'react';
 import { usePathname } from "next/navigation"
+import Image from 'next/image';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -38,13 +39,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
         <div className="flex flex-col h-full">
           {/* Header */}
           <header className="p-4 flex justify-between items-center border-b border-[#415A77]/20">
-            <a
+            <Link
               className="flex-none font-semibold text-xl text-[#F1F5F9] focus:outline-none focus:opacity-80"
-              href="#"
+              href="/dashboard"
               aria-label="TaskHub"
             >
-              TaskHub
-            </a>
+             <Image src="/logo.png" alt="Logo" width={150} height={0} />
+            </Link>
             <button
               type="button"
               className="lg:hidden flex justify-center items-center w-6 h-6 bg-[#1B263B] border border-[#415A77]/20 text-gray-400 hover:bg-[#415A77]/10 rounded-full focus:outline-none focus:bg-[#415A77]/10"

@@ -18,11 +18,11 @@ const Login = () => {
     onSuccess: (data) => {
       toast.success('Login successful!');
       console.log('Login successful:', data?.data);
-      console.log('Token:', data?.data.token);
-      sessionStorage.setItem('token', data?.data.token);
+      // console.log('Token:', data?.data.token);
+      // sessionStorage.setItem('token', data?.data.token);
       if(data?.data.data.role === 'admin') {
         router.push('/admin');
-        sessionStorage.setItem('role', data?.data.data.role);
+        // sessionStorage.setItem('role', data?.data.data.role);
       }else{
         router.push('/dashboard');
       }

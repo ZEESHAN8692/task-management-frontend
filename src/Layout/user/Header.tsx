@@ -1,8 +1,11 @@
 "use client";
 import { useRouter } from 'next/navigation';
 import React, { use } from 'react';
-import { getProfile } from '@/queryFunction/queryFunction';
+import { getProfile, logout } from '@/queryFunction/queryFunction';
 import { useQuery } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
+import apiInstance from '@/api/axiosInstance';
+import { api_logout_end } from '@/api/api_url';
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -11,11 +14,22 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   const router = useRouter();
-  const handleLogout = () => {
-    window.confirm("Are you sure you want to logout?")
-    sessionStorage.clear();
-    router.push('/login');
+const handleLogout = async () => {
+  const confirmLogout = window.confirm("Are you sure you want to logout?");
+  if (confirmLogout) {
+    try {
+      const res = await logout();
+      if (res.status === 200) {
+        toast.success("Logout Successfully");
+        router.push("/login");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Error logging out");
+    }
   }
+};
+
 
   const {data , isLoading} = useQuery({
     queryKey: ['profile'],
@@ -48,7 +62,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
             </svg>
           </button>
           <h1 className="text-xl font-semibold text-[#F1F5F9] lg:block">
-            Task Management
+            Task Management User Dashboard
           </h1>
         </div>
 

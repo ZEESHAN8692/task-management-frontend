@@ -9,23 +9,31 @@ const apiInstance: AxiosInstance = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
+  withCredentials: true
 });
-
 
 apiInstance.interceptors.request.use(
   (config) => {
-
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token') 
-    if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-        config.headers["x-access-token"] = token;
-    }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
+
+
+// apiInstance.interceptors.request.use(
+//   (config) => {
+
+//     const token = localStorage.getItem('token') || sessionStorage.getItem('token') 
+//     if (token) {
+//     //   config.headers.Authorization = `Bearer ${token}`;
+//         config.headers["x-access-token"] = token;
+//     }
+//     return config;
+//   },
+//   (error) => {
+//     return Promise.reject(error);
+//   }
+// );
 
 
 apiInstance.interceptors.response.use(
