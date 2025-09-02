@@ -1,4 +1,5 @@
 "use client";
+import Image from 'next/image';
 import Link from 'next/link'
 import { usePathname } from 'next/navigation';
 
@@ -25,7 +26,17 @@ const LandingHeader = () => {
             {/* Logo */}
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <h1 className="text-2xl font-bold text-[#F1F5F9]">TaskHub</h1>
+                <Link href="/">
+                 <Image
+                  src="/logo.png"
+                  alt="TaskHub Logo"
+                  width={150}
+                  height={80}
+                  className="h-14 w-auto m-0.5"
+                  />
+                </Link>
+                
+                {/* <h1 className="text-2xl font-bold text-[#F1F5F9]">TaskHub</h1> */}
               </div>
             </div>
 
