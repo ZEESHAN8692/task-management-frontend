@@ -12,7 +12,7 @@ import AdminFooter from "@/Layout/user/admin/AdminFooter";
 import { ToastContainer } from "react-toastify";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 const queryClient = new QueryClient();
-
+ 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
